@@ -60,7 +60,7 @@
         <h2>Technologies used</h2>
         <ol>
             <li>To build the project: <a href="http://gulpjs.com/" target="_blank">Gulp.js</a> on <a href="https://nodejs.org/en/" target="_blank">Node.js</a></li>
-            <li class="next">To load dependencies: <a href="https://www.npmjs.com/" target="_blank">npm</a> (Node Package Manager)</li>
+            <li class="next">To load dependencies: <a href="https://www.npmjs.com/" target="_blank">npm</a> (Package Manager for JavaScript)</li>
             <li class="next">To write the code: <a href="https://www.typescriptlang.org/" target="_blank">TypeScript</a></li>
             <li class="next">To interact with an User: HTML + SVG + <a href="http://sass-lang.com/" target="_blank">Sass</a></li>
             <li class="next">To display nice icons: <a href="http://fontawesome.io/" target="_blank">Font Awesome</a></li>
@@ -70,7 +70,53 @@
     </section>
 
     <section class="slide">
-        <h2>Project Build Phases</h2>
+        <h2>Project Dependencies with npm</h2>
+        <ol>
+            <li>Build-time dependencies (devDependencies)</li>
+            <li>Runtime dependencies (dependencies)</li>
+        </ol>
+        <pre style="font-size: 21px; height: 40%; overflow-x: hidden; overflow-y: scroll; white-space: nowrap;" class="language-javascript line-numbers">
+            <code style="line-height: 1.4; padding-left: 50px;">
+{
+  "name": "graph-editor",
+  "version": "1.0.1",
+  "devDependencies": {
+    "browser-sync": "2.18.5",
+    "gulp": "3.9.1",
+    "gulp-clean": "0.3.2",
+    "gulp-concat": "2.6.1",
+    "gulp-filter": "4.0.0",
+    "gulp-folders": "1.1.0",
+    "gulp-order": "1.1.1",
+    "gulp-rev": "7.1.2",
+    "gulp-rev-all": "0.9.7",
+    "gulp-rev-replace": "0.4.3",
+    "gulp-sass": "2.3.2",
+    "gulp-sourcemaps": "1.9.1",
+    "gulp-typescript": "3.1.3",
+    "gulp-util": "3.0.8",
+    "jasmine-core": "2.5.2",
+    "merge2": "1.0.3",
+    "requirejs": "2.3.2",
+    "typescript": "2.1.4"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.14.45",
+    "d3": "3.5.17",
+    "font-awesome": "4.7.0",
+    "lodash": "4.17.4"
+  }
+}
+            </code>
+        </pre>
+        <h2>package.json</h2>
+    </section>
+
+    <section class="slide">
+        <h2>Project Build with Gulp</h2>
         <ol>
             <li class="next">Copy HTML</li>
             <li class="next">Concatenate JavaScript libraries into single JS file</li>
@@ -205,12 +251,36 @@ gulp.task('server', ['default', 'browser-sync']);
 
 
     <section class="slide">
+        <h2>TypeScript</h2>
+        <ol>
+            <li>"TypeScript is a typed superset of JavaScript that compiles to plain JavaScript"</li>
+            <li>Classes and Interfaces</li>
+            <li>Types annotation</li>
+            <li>Support for constants and variables</li>
+            <li>Compile time errors</li>
+            <li>Compatibility with JavaScript</li>
+            <li>... and many more</li>
+        </ol>
+    </section>
+
+    <section class="slide">
         <h2>Drag & Drop phases</h2>
         <ol>
             <li class="next">Mouse pointer is placed over an object</li>
             <li class="next">Left mouse button is pressed</li>
             <li class="next">Mouse pointer is being moved to new location</li>
             <li class="next">Left mouse button is released</li>
+        </ol>
+    </section>
+
+
+    <section class="slide">
+        <h2>Drag behavior (D3 & TypeScript Wrapper)</h2>
+        <ol>
+            <li class="next">Origin</li>
+            <li class="next">On drag started</li>
+            <li class="next">On dragged</li>
+            <li class="next">On drag ended</li>
         </ol>
     </section>
 
