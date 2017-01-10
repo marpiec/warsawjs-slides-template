@@ -1,4 +1,4 @@
-# Simple Graph Editor: Built with Typescript + D3.js
+# Simple Graph Editor: Built with TypeScript + D3
 
 ![Logo](/pictures/logo/warsawjs-logo-light.png)
 
