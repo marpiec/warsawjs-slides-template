@@ -28,7 +28,7 @@
         </div>
         <div class="details">
             <!-- 1. Avatar -->
-            <img src="pictures/fake-speaker-avatar.jpg" alt="Speaker"/>
+            <img src="pictures/fake-speaker-avatar.jpg" alt="Speaker" height="200"/>
 
             <!-- 2. Speaker -->
             <h2>Marcin Pieciukiewicz</h2>
@@ -252,8 +252,12 @@ gulp.task('server', ['default', 'browser-sync']);
 
     <section class="slide">
         <h2>TypeScript</h2>
+        <blockquote>
+            <p>
+                TypeScript is a typed superset of JavaScript that compiles to plain JavaScript
+            </p>
+        </blockquote>
         <ol>
-            <li>"TypeScript is a typed superset of JavaScript that compiles to plain JavaScript"</li>
             <li>Classes and Interfaces</li>
             <li>Types annotation</li>
             <li>Support for constants and variables</li>
@@ -262,6 +266,38 @@ gulp.task('server', ['default', 'browser-sync']);
             <li>... and many more</li>
         </ol>
     </section>
+
+    <section class="slide">
+        <h2>Data-Driven Documents (D3)</h2>
+    </section>
+
+    <section class="slide">
+        <h2>Building Graph Editor</h2>
+    </section>
+
+    <section class="slide">
+        <h2>Graph Editor model</h2>
+        <pre style="font-size: 21px; height: 80%; overflow-x: hidden; white-space: nowrap;" class="language-javascript line-numbers">
+            <code style="line-height: 1.4; padding-left: 50px;">
+                // Simplified code
+                class GraphNode {
+                    id: number;
+                    position: PositionXY;
+                }
+                class GraphEdge {
+                    id: number;
+                    fromNodeId: number;
+                    toNodeId: number;
+                }
+                class GraphViewModel {
+                    nodes: Array&lt;GraphNode&gt;;
+                    edges: Array&lt;GraphEdge&gt;;
+                }
+            </code>
+        </pre>
+    </section>
+
+
 
     <section class="slide">
         <h2>Drag & Drop phases</h2>
