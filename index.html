@@ -17,7 +17,7 @@
 </head>
 <body class="shower list">
     <header class="caption">
-        <h1>WarsawJS Slides: Template</h1>
+        <h1>Simple Graph Editor: Built with TypeScript + D3</h1>
         <p>We talk about JavaScript. Each month in Warsaw, Poland.</p>
     </header>
 
@@ -31,18 +31,191 @@
             <img src="pictures/fake-speaker-avatar.jpg" alt="Speaker"/>
 
             <!-- 2. Speaker -->
-            <h2>Speaker name</h2>
+            <h2>Marcin Pieciukiewicz</h2>
 
             <!-- 3. Presentation title -->
-            <h2><strong>"WarsawJS Slides: Template"</strong></h2>
+            <h2><strong>"Simple Graph Editor: Built with TypeScript + D3"</strong></h2>
 
             <!-- 4. Presentation date -->
-            <h2>XXXX-XX-XX</h2>
+            <h2>2017-01-11</h2>
 
             <!-- 5. Contact the speaker -->
-            <h2><a href="http://twitter.com/speaker">@speaker</a></h2>
+            <h2><a href="http://twitter.com/marpiec">@marpiec</a></h2>
         </div>
     </section>
+
+    <section class="slide">
+        <h2>Requirements</h2>
+        <ol>
+            <li>User can add node using "double click"</li>
+            <li class="next">User can remove selected node using "delete" keyboard button</li>
+            <li class="next">User can move node around the screen using a mouse</li>
+            <li class="next">User can add edge by dragging it out from a node</li>
+            <li class="next">User can remove selected edge using "delete" keyboard button</li>
+        </ol>
+        <p class="next"><a href="http://marpiec.github.io/GraphEditor/" target="_blank">Try it out!</a></p>
+    </section>
+
+    <section class="slide">
+        <h2>Technologies used</h2>
+        <ol>
+            <li>To build the project: <a href="http://gulpjs.com/" target="_blank">Gulp.js</a> on <a href="https://nodejs.org/en/" target="_blank">Node.js</a></li>
+            <li class="next">To load dependencies: <a href="https://www.npmjs.com/" target="_blank">npm</a> (Node Package Manager)</li>
+            <li class="next">To write the code: <a href="https://www.typescriptlang.org/" target="_blank">TypeScript</a></li>
+            <li class="next">To interact with an User: HTML + SVG + <a href="http://sass-lang.com/" target="_blank">Sass</a></li>
+            <li class="next">To display nice icons: <a href="http://fontawesome.io/" target="_blank">Font Awesome</a></li>
+            <li class="next">To generate HTML based on data: <a href=https://d3js.org/" target="_blank">Data-Driven Documents (D3)</a></li>
+            <li class="next">To manipulate data: <a href="https://lodash.com/" target="_blank">Lodash</a></li>
+        </ol>
+    </section>
+
+    <section class="slide">
+        <h2>Project Build Phases</h2>
+        <ol>
+            <li class="next">Copy HTML</li>
+            <li class="next">Concatenate JavaScript libraries into single JS file</li>
+            <li class="next">Compile TypeScript files into single JS file</li>
+            <li class="next">Compile Sass files into single CSS file</li>
+            <li class="next">Copy font files</li>
+            <li class="next">Rename files and references to prevent browser cache</li>
+        </ol>
+    </section>
+
+
+    <section class="slide">
+        <pre style="font-size: 21px; height: 80%; overflow: auto; white-space: nowrap;" class="language-javascript line-numbers">
+            <code style="line-height: 1.4; padding-left: 50px;">
+var gulp = require('gulp');
+var ts = require('gulp-typescript');
+var browserSync = require('browser-sync').create();
+var merge = require('merge2');
+var sass = require('gulp-sass');
+var clean = require('gulp-clean');
+var sourcemaps = require('gulp-sourcemaps');
+var rev = require('gulp-rev');
+var revReplace = require('gulp-rev-replace');
+var gulpFilter = require('gulp-filter');
+var concat = require('gulp-concat');
+
+var buildDir = function(path) {return './build/' + path};
+var appDir = function(path) {return './app/' + path};
+var stylesDir = function(path) {return './app/styles/' + path};
+var npmModulesDir = function(path) {return './node_modules/' + path};
+var releaseDevDir = function(path) {return './build/releaseDev/' + path};
+var releaseDir = function(path) {return './build/release/' + path};
+var npmDependency = function(dependency, dependencyMinimized, minimized) {return minimized ? npmModulesDir(dependencyMinimized) : npmModulesDir(dependency)};
+
+// HTML
+gulp.task('html', function() {
+  return gulp.src('app/*.html')
+   .pipe(gulp.dest(releaseDevDir('')))
+});
+
+gulp.task('scripts-libs', function() {
+  return gulp.src([
+   npmDependency('lodash/lodash.js', 'lodash/lodash.min.js', true),
+   npmDependency('d3/d3.js', 'd3/d3.min.js', true)
+  ]).pipe(concat('libs.js')).pipe(gulp.dest(releaseDevDir('scripts/')))
+});
+
+var tsProject = ts.createProject('./app/scripts/tsconfig.json');
+
+gulp.task('scripts', function () {
+  var tsResult = tsProject.src()
+   .pipe(sourcemaps.init())
+   .pipe(tsProject());
+
+  return merge([
+   tsResult.dts
+    .pipe(gulp.dest(releaseDevDir('scripts'))),
+   tsResult.js
+    .pipe(sourcemaps.write("../maps"))
+    .pipe(gulp.dest(releaseDevDir('scripts')))
+  ]);
+
+});
+
+gulp.task('styles', function () {
+  gulp.src(stylesDir('**/*.scss'))
+   .pipe(sourcemaps.init())
+   .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
+   .pipe(sourcemaps.write('.'))
+   .pipe(gulp.dest(releaseDevDir('styles')));
+});
+
+// HTML
+gulp.task('fonts', function() {
+  return gulp.src([npmModulesDir('font-awesome/fonts/*')])
+   .pipe(gulp.dest(releaseDevDir('fonts')))
+});
+
+// Static server
+gulp.task('browser-sync', ['scripts'], function() {
+  browserSync.init({
+   server: {
+    baseDir: releaseDevDir('')
+   }
+  });
+
+  gulp.watch(appDir('**/*.ts*'), ['scripts']);
+  gulp.watch(appDir('**/*.scss'), ['styles']);
+  gulp.watch(appDir('**/*.html'), ['html']);
+  gulp.watch(appDir('**/*.html')).on('change', browserSync.reload);
+});
+
+gulp.task('clean', function() {
+  return merge([
+   gulp.src(buildDir(''), {read: false}).pipe(clean()),
+   gulp.src(releaseDevDir(''), {read: false}).pipe(clean()),
+   gulp.src(releaseDir(''), {read: false}).pipe(clean())]);
+});
+
+gulp.task('clean-release', function() {
+   return gulp.src(releaseDir('')).pipe(clean());
+});
+
+gulp.task('revision', ['clean-release', 'html', 'scripts-libs', 'scripts', 'styles', 'fonts'], function() {
+  const revisionedFilter = gulpFilter(['**/*.*', '!**/index.html'], {restore: true});
+  const nonRevisionedFilter = gulpFilter(['**/index.html']);
+  return gulp.src([releaseDevDir('**/*')])
+   .pipe(revisionedFilter)
+   .pipe(rev())
+   .pipe(gulp.dest(releaseDir('')))
+   .pipe(rev.manifest())
+   .pipe(gulp.dest(buildDir('')))
+   .pipe(revisionedFilter.restore)
+   .pipe(nonRevisionedFilter)
+   .pipe(gulp.dest(releaseDir('')))
+});
+
+gulp.task("revreplace", ["revision"], function(){
+  var manifest = gulp.src(buildDir('rev-manifest.json'));
+  return gulp.src(releaseDir('**/*.*'))
+   .pipe(revReplace({manifest: manifest}))
+   .pipe(gulp.dest(releaseDir('')));
+});
+
+gulp.task('release', ['default', 'revreplace']);
+gulp.task('default', ['html', 'scripts-libs', 'scripts', 'styles', 'fonts']);
+gulp.task('server', ['default', 'browser-sync']);
+            </code>
+        </pre>
+        <h2>gulpfile.js</h2>
+    </section>
+
+
+    <section class="slide">
+        <h2>Drag & Drop phases</h2>
+        <ol>
+            <li class="next">Mouse pointer is placed over an object</li>
+            <li class="next">Left mouse button is pressed</li>
+            <li class="next">Mouse pointer is being moved to new location</li>
+            <li class="next">Left mouse button is released</li>
+        </ol>
+    </section>
+
+
+
 
     <section class="slide">
         <h2>Please update slides:</h2>
