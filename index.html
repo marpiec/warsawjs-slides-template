@@ -127,43 +127,6 @@
             <li>Build-time dependencies (devDependencies)</li>
             <li>Runtime dependencies (dependencies)</li>
         </ol>
-        <pre style="font-size: 21px; height: 40%; overflow-x: hidden; overflow-y: scroll; white-space: nowrap;" class="language-javascript line-numbers">
-            <code style="line-height: 1.4; padding-left: 50px;">
-{
-  "name": "graph-editor",
-  "version": "1.0.1",
-  "devDependencies": {
-    "browser-sync": "2.18.5",
-    "gulp": "3.9.1",
-    "gulp-clean": "0.3.2",
-    "gulp-concat": "2.6.1",
-    "gulp-filter": "4.0.0",
-    "gulp-folders": "1.1.0",
-    "gulp-order": "1.1.1",
-    "gulp-rev": "7.1.2",
-    "gulp-rev-all": "0.9.7",
-    "gulp-rev-replace": "0.4.3",
-    "gulp-sass": "2.3.2",
-    "gulp-sourcemaps": "1.9.1",
-    "gulp-typescript": "3.1.3",
-    "gulp-util": "3.0.8",
-    "jasmine-core": "2.5.2",
-    "merge2": "1.0.3",
-    "requirejs": "2.3.2",
-    "typescript": "2.1.4"
-  },
-  "engines": {
-    "node": ">=0.10.0"
-  },
-  "dependencies": {
-    "@types/lodash": "^4.14.45",
-    "d3": "3.5.17",
-    "font-awesome": "4.7.0",
-    "lodash": "4.17.4"
-  }
-}
-            </code>
-        </pre>
         <h2>package.json</h2>
     </section>
 
@@ -176,143 +139,19 @@
             <li>Copy static files</li>
             <li>Rename files and references to prevent browser cache</li>
         </ol>
-    </section>
-
-
-    <section class="slide">
-        <pre style="font-size: 21px; height: 80%; overflow: auto; white-space: nowrap;" class="language-javascript line-numbers">
-            <code style="line-height: 1.4; padding-left: 50px;">
-var gulp = require('gulp');
-var ts = require('gulp-typescript');
-var browserSync = require('browser-sync').create();
-var merge = require('merge2');
-var sass = require('gulp-sass');
-var clean = require('gulp-clean');
-var sourcemaps = require('gulp-sourcemaps');
-var rev = require('gulp-rev');
-var revReplace = require('gulp-rev-replace');
-var gulpFilter = require('gulp-filter');
-var concat = require('gulp-concat');
-
-var buildDir = function(path) {return './build/' + path};
-var appDir = function(path) {return './app/' + path};
-var stylesDir = function(path) {return './app/styles/' + path};
-var npmModulesDir = function(path) {return './node_modules/' + path};
-var releaseDevDir = function(path) {return './build/releaseDev/' + path};
-var releaseDir = function(path) {return './build/release/' + path};
-var npmDependency = function(dependency, dependencyMinimized, minimized) {return minimized ? npmModulesDir(dependencyMinimized) : npmModulesDir(dependency)};
-
-// HTML
-gulp.task('html', function() {
-  return gulp.src('app/*.html')
-   .pipe(gulp.dest(releaseDevDir('')))
-});
-
-gulp.task('scripts-libs', function() {
-  return gulp.src([
-   npmDependency('lodash/lodash.js', 'lodash/lodash.min.js', true),
-   npmDependency('d3/d3.js', 'd3/d3.min.js', true)
-  ]).pipe(concat('libs.js')).pipe(gulp.dest(releaseDevDir('scripts/')))
-});
-
-var tsProject = ts.createProject('./app/scripts/tsconfig.json');
-
-gulp.task('scripts', function () {
-  var tsResult = tsProject.src()
-   .pipe(sourcemaps.init())
-   .pipe(tsProject());
-
-  return merge([
-   tsResult.dts
-    .pipe(gulp.dest(releaseDevDir('scripts'))),
-   tsResult.js
-    .pipe(sourcemaps.write("../maps"))
-    .pipe(gulp.dest(releaseDevDir('scripts')))
-  ]);
-
-});
-
-gulp.task('styles', function () {
-  gulp.src(stylesDir('**/*.scss'))
-   .pipe(sourcemaps.init())
-   .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
-   .pipe(sourcemaps.write('.'))
-   .pipe(gulp.dest(releaseDevDir('styles')));
-});
-
-// HTML
-gulp.task('fonts', function() {
-  return gulp.src([npmModulesDir('font-awesome/fonts/*')])
-   .pipe(gulp.dest(releaseDevDir('fonts')))
-});
-
-// Static server
-gulp.task('browser-sync', ['scripts'], function() {
-  browserSync.init({
-   server: {
-    baseDir: releaseDevDir('')
-   }
-  });
-
-  gulp.watch(appDir('**/*.ts*'), ['scripts']);
-  gulp.watch(appDir('**/*.scss'), ['styles']);
-  gulp.watch(appDir('**/*.html'), ['html']);
-  gulp.watch(appDir('**/*.html')).on('change', browserSync.reload);
-});
-
-gulp.task('clean', function() {
-  return merge([
-   gulp.src(buildDir(''), {read: false}).pipe(clean()),
-   gulp.src(releaseDevDir(''), {read: false}).pipe(clean()),
-   gulp.src(releaseDir(''), {read: false}).pipe(clean())]);
-});
-
-gulp.task('clean-release', function() {
-   return gulp.src(releaseDir('')).pipe(clean());
-});
-
-gulp.task('revision', ['clean-release', 'html', 'scripts-libs', 'scripts', 'styles', 'fonts'], function() {
-  const revisionedFilter = gulpFilter(['**/*.*', '!**/index.html'], {restore: true});
-  const nonRevisionedFilter = gulpFilter(['**/index.html']);
-  return gulp.src([releaseDevDir('**/*')])
-   .pipe(revisionedFilter)
-   .pipe(rev())
-   .pipe(gulp.dest(releaseDir('')))
-   .pipe(rev.manifest())
-   .pipe(gulp.dest(buildDir('')))
-   .pipe(revisionedFilter.restore)
-   .pipe(nonRevisionedFilter)
-   .pipe(gulp.dest(releaseDir('')))
-});
-
-gulp.task("revreplace", ["revision"], function(){
-  var manifest = gulp.src(buildDir('rev-manifest.json'));
-  return gulp.src(releaseDir('**/*.*'))
-   .pipe(revReplace({manifest: manifest}))
-   .pipe(gulp.dest(releaseDir('')));
-});
-
-gulp.task('release', ['default', 'revreplace']);
-gulp.task('default', ['html', 'scripts-libs', 'scripts', 'styles', 'fonts']);
-gulp.task('server', ['default', 'browser-sync']);
-            </code>
-        </pre>
         <h2>gulpfile.js</h2>
     </section>
-
-
 
     <section class="slide">
         <h2>Building Graph Editor</h2>
         <ol>
-            <li>Main components
+            <li>Components
                 <ul>
-                    <li>Main (context)</li>
-                    <li>GraphController</li>
-                    <li>GraphCommandBus</li>
+                    <li>Graph Model</li>
+                    <li>Graph Controller</li>
+                    <li>Graph Command Bus</li>
                 </ul>
             </li>
-            <li>Model</li>
             <li>HTML + SVG Generation</li>
             <li>Drag & Drop</li>
             <li>Other user input</li>
@@ -320,10 +159,13 @@ gulp.task('server', ['default', 'browser-sync']);
     </section>
 
     <section class="slide">
-        <h2>Graph Editor model</h2>
+        <h2>Graph Model</h2>
         <pre style="font-size: 21px; height: 80%; overflow-x: hidden; white-space: nowrap;" class="language-javascript line-numbers">
             <code style="line-height: 1.4; padding-left: 50px;">
-                // Simplified code
+                class GraphModel {
+                    nodes: Array&lt;GraphNode&gt;;
+                    edges: Array&lt;GraphEdge&gt;;
+                }
                 class GraphNode {
                     id: number;
                     position: PositionXY;
@@ -332,10 +174,6 @@ gulp.task('server', ['default', 'browser-sync']);
                     id: number;
                     fromNodeId: number;
                     toNodeId: number;
-                }
-                class GraphViewModel {
-                    nodes: Array&lt;GraphNode&gt;;
-                    edges: Array&lt;GraphEdge&gt;;
                 }
             </code>
         </pre>
