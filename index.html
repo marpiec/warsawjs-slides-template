@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>WarsawJS Slides: Template</title>
+    <title>Simple Graph Editor</title>
 
     <meta charset="utf-8"/>
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -54,12 +54,11 @@
             <li>CQRS - 3 years</li>
             <li>UX Design, DevOps, customer support and a few more...</li>
         </ol>
-        <p class="next"><a href="http://marpiec.github.io/GraphEditor/" target="_blank">Try it out!</a></p>
     </section>
 
 
     <section class="slide">
-        <h2>Requirements</h2>
+        <h2>Graph Editor Requirements</h2>
         <ol>
             <li>User can add node using "double click"</li>
             <li>User can remove selected node using "delete" keyboard button</li>
@@ -297,11 +296,17 @@ gulp.task('server', ['default', 'browser-sync']);
     <section class="slide">
         <h2>Building Graph Editor</h2>
         <ol>
+            <li>Main components
+                <ul>
+                    <li>Main (context)</li>
+                    <li>GraphController</li>
+                    <li>GraphCommandBus</li>
+                </ul>
+            </li>
             <li>Model</li>
             <li>HTML + SVG Generation</li>
             <li>Drag & Drop</li>
             <li>Other user input</li>
-            <li>... and many more</li>
         </ol>
     </section>
 
